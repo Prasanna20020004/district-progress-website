@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>District Data Explorer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#0284c7',
+            accent: '#10b981',
+            dark: '#0f172a',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-gradient-to-br from-sky-50 to-sky-100 min-h-screen font-sans text-gray-800">
+  <header class="bg-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <h1 class="text-2xl md:text-3xl font-bold text-primary tracking-tight flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M10 2a8 8 0 00-8 8v5a3 3 0 003 3h2v-6H5v-2a5 5 0 1110 0v2h-2v6h2a3 3 0 003-3v-5a8 8 0 00-8-8z" />
+        </svg>
+        Maharashtra MGNREGA Data Explorer
+      </h1>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-10">
+    <div class="bg-white/80 backdrop-blur-xl shadow-2xl rounded-3xl p-8 border border-slate-100">
+      <h2 class="text-2xl font-semibold text-dark mb-6 border-b pb-3">Select Filters</h2>
+
+      <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div>
+          <label class="block text-sm font-semibold text-slate-600 mb-2">District</label>
+          <select name="district" class="border border-slate-300 rounded-xl w-full p-3 focus:ring-2 focus:ring-primary focus:outline-none bg-white shadow-sm" required>
+            <option value="">-- Select District --</option>
+            {% for d in districts %}
+              <option value="{{ d }}" {% if selected_district == d %}selected{% endif %}>{{ d }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-600 mb-2">Financial Year</label>
+          <select name="year" class="border border-slate-300 rounded-xl w-full p-3 focus:ring-2 focus:ring-primary focus:outline-none bg-white shadow-sm">
+            <option value="">All years</option>
+            {% for y in years %}
+              <option value="{{ y }}" {% if selected_year == y %}selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="flex items-end gap-4 md:col-span-2">
+          <button type="submit"
+            class="bg-primary hover:bg-sky-700 transition-all text-white rounded-xl px-8 py-3 font-medium shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v16h16V4H4zm2 2h12v12H6V6z"/>
+            </svg>
+            Load Data
+          </button>
+
+          {% if table_rows %}
+            <a href="{% url 'summary' %}?district={{ selected_district }}&year={{ selected_year }}"
+              class="bg-accent hover:bg-emerald-700 transition-all text-white rounded-xl px-8 py-3 font-medium shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5h12M9 12h12M9 19h12M3 5h.01M3 12h.01M3 19h.01" />
+              </svg>
+              View Summary
+            </a>
+          {% endif %}
+        </div>
+      </form>
+
+      {% if table_rows %}
+        <div class="overflow-x-auto mt-6 rounded-2xl shadow-inner border border-slate-200">
+          <table class="w-full text-sm border-collapse">
+            <thead class="bg-gradient-to-r from-sky-100 to-sky-200 text-sky-900">
+              <tr>
+                {% for k, v in table_rows.0.items %}
+                  <th class="px-4 py-3 text-left font-semibold uppercase tracking-wide border-b border-slate-200">{{ k|title }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in table_rows %}
+                <tr class="odd:bg-white even:bg-slate-50 hover:bg-sky-50 transition-colors duration-150">
+                  {% for k, v in row.items %}
+                    <td class="px-4 py-3 border-b border-slate-100">{{ v }}</td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center py-12 text-slate-500">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 mx-auto mb-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="text-lg">Please select a district to view data.</p>
+        </div>
+      {% endif %}
+    </div>
+  </main>
+
+  <footer class="text-center py-6 text-sm text-slate-500">
+    © 2025 Maharashtra MGNREGA Data Explorer • Designed for Data Transparency
+  </footer>
+</body>
+</html>
